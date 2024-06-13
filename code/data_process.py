@@ -4,6 +4,7 @@ import tensorflow as tf
 from config import cfg
 from scipy import signal
 import numpy.fft as nf
+import os
 # from sklearn.preprocessing import StandardScaler
 
 def _bytes_feature(value):
@@ -51,6 +52,17 @@ def open_excel(filename):
     target = int(num) % cfg.category
     return data, target
 
+def read_xlsx(filename):
+    """
+    打开数据集，进行数据处理
+    :param filename:文件名
+    :return:特征集数据、标签集数据
+    """
+    readbook = pd.read_excel(filename, engine='openpyxl', header=None)
+#     .T：转置 to_numpy：转换为 NumPy 数组
+    nplist = readbook.T
+    data = nplist[0:cfg.column].T
+    return data
 
 def gennerate_terecord_file(tfrecordtrainfilename,tfrecordvalfilename,start,end):
     """
@@ -95,7 +107,84 @@ def gennerate_terecord_file(tfrecordtrainfilename,tfrecordvalfilename,start,end)
             trainwriter.close()
             valwriter.close()
 
-def   gennerate_terecord_file_energy(tfrecordtrainfilename,tfrecordvalfilename,start,end):
+def gennerate_terecord_trainfile(tfrecordtrainfilename,tfrecordvalfilename):
+    batch_size = cfg.one_batch_size
+    val_rate = cfg.val_rate
+    val_num_samples = 0
+    train_num_samples = 0
+    with tf.io.TFRecordWriter(tfrecordtrainfilename) as trainwriter:
+        with tf.io.TFRecordWriter(tfrecordvalfilename) as valwriter:
+            filenames = os.listdir(r"../raw_data/")
+            file_index = 0
+            files_number = len(filenames)
+            for filename in filenames:
+                print(filename)
+                if filename.endswith('m.xlsx'):
+                    print('0')
+                    label = 0
+                elif filename.endswith('right.xlsx'):
+                    print('1')
+                    label = 1
+                elif filename.endswith('left.xlsx'):
+                    print('2')
+                    label = 2
+                # elif filename.endswith('motion.xlsx'):
+                #     print('3')
+                #     label = 3
+                else:
+                    continue
+                raw_data = read_xlsx(f'../raw_data/{filename}')
+                raw_data_len = len(raw_data)
+                batch = int(raw_data_len / batch_size)
+                modnum = int(batch / (batch * (val_rate)))
+                index = 1
+                for j in range(batch):
+                    b_data = raw_data.loc[index:index + batch_size - 1].values
+                    batch_data = []
+                    # 求能量
+                    for r in range(0, cfg.row):
+                        s = 125
+                        energy = []
+                        for clo in range(0, cfg.column):
+                            r_data = b_data[s * r:(r + 1) * s, clo]
+                            complex_ary = nf.fft(r_data)
+                            fft_pow = np.abs(complex_ary) / s * 2
+                            fft_pow[0] = fft_pow[0] / 2
+                            fft_pow = fft_pow[0:int(s / 2)]
+                            ener = np.sum(fft_pow ** 2)
+                            energy.append(ener)
+                        batch_data.extend(energy)
+                    batch_data = np.array(batch_data)
+                    # flatten()是对多维数据的降维函数
+                    batch_data = np.float32(batch_data.flatten())
+                    # batch_data = np.float32(batch_data).to_numpy()
+                    # print(type(batch_data))
+                    index = index + batch_size
+                    feature = {
+                        'data': _float_feature(batch_data),
+                        'label': _int64_feature(label)
+                    }
+                    example = tf.train.Example(
+                        features=tf.train.Features(feature=feature))
+                    if j % modnum != 0:
+                        trainwriter.write(example.SerializeToString())
+                        train_num_samples = train_num_samples + 1
+                    else:
+                        valwriter.write(example.SerializeToString())
+                        val_num_samples = val_num_samples + 1
+                file_index = file_index + 1
+                print("data process complete : " + str(file_index / files_number * 100) + '%')
+            print("train_num_samples:", train_num_samples)
+            print("val_num_samples：", val_num_samples)
+            data = [train_num_samples, val_num_samples]
+            m = np.array(data)
+            np.save(cfg.train_num_samples_file_name, m)  # 保存
+        trainwriter.close()
+        valwriter.close()
+
+
+
+def gennerate_terecord_file_energy(tfrecordtrainfilename,tfrecordvalfilename,start,end):
     """
     生成tfrecord文件
     :param tfrecordfilename: 生成的tfrecord文件名字
