@@ -65,12 +65,13 @@ def train_and_val(trial):
         tf.keras.callbacks.ModelCheckpoint('../model/posture_classify.h5', monitor='val_accuracy', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
     ]
 
-
+    batch_size = trial.suggest_int("batch_size", 1, 128, log=True)
+    epochs = trial.suggest_int("epochs", 100, cfg.epochs, log=True)
     # 模型训练
     history = model.fit(train_data,
-                        epochs=cfg.epochs,
+                        epochs=epochs,
                         # validation_split=0.2,
-                        batch_size=cfg.batch_size,
+                        batch_size=batch_size,
                         callbacks=callback,
                         shuffle=True,
                         verbose=1,
@@ -90,25 +91,25 @@ def train_and_val(trial):
     val_loss = history.history['val_loss']
 
     # 画出训练和测试的准确率和损失值
-    epochs_range = range(cfg.epochs)
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.plot(epochs_range, acc, label='Training Accuracy')
-    plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-    plt.legend(loc='lower right')
-    plt.title('Training and Validation Accuracy')
-
-    plt.subplot(1, 2, 2)
-    plt.plot(epochs_range, loss, label='Training Loss')
-    plt.plot(epochs_range, val_loss, label='Validation Loss')
-    plt.legend(loc='upper right')
-    plt.title('Training and Validation Loss')
-
-    # 保存图片12
-    result_png = "../result_img/" + "result_" + datetime.datetime.now(
-    ).strftime("%m%d_%H%M%S") + ".png"
-    plt.savefig(result_png)
-    plt.show()
+    # epochs_range = range(cfg.epochs)
+    # plt.figure()
+    # plt.subplot(1, 2, 1)
+    # plt.plot(epochs_range, acc, label='Training Accuracy')
+    # plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+    # plt.legend(loc='lower right')
+    # plt.title('Training and Validation Accuracy')
+    #
+    # plt.subplot(1, 2, 2)
+    # plt.plot(epochs_range, loss, label='Training Loss')
+    # plt.plot(epochs_range, val_loss, label='Validation Loss')
+    # plt.legend(loc='upper right')
+    # plt.title('Training and Validation Loss')
+    #
+    # # 保存图片12
+    # result_png = "../result_img/" + "result_" + datetime.datetime.now(
+    # ).strftime("%m%d_%H%M%S") + ".png"
+    # plt.savefig(result_png)
+    # plt.show()
 
     test_dataset = gen_data_batch(cfg.val_dataset_path,
                                   cfg.batch_size,
