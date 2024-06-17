@@ -4,7 +4,8 @@ from model import *
 import matplotlib.pyplot as plt
 from data_process import *
 import datetime
-
+import optuna
+from optuna.trial import TrialState
 
 #配置GPU，限制GPU内存增长
 def GPU_Config():
@@ -20,7 +21,7 @@ def GPU_Config():
             # Memory growth must be set before GPUs have been initialized
             print(e)
 
-def train_and_val():
+def train_and_val(trial):
     # 读取验证训练集和测试集长度
     list_num_samples = np.load(cfg.train_num_samples_file_name)  # 读取
     cfg.train_num_samples = list_num_samples[0]
@@ -36,7 +37,8 @@ def train_and_val():
     model = cnn_model()
 
     # Adam优化器
-    optimizer = tf.keras.optimizers.Adam(learning_rate=cfg.train_learning_rate)
+    lr = trial.suggest_float("learning_rate", 1e-5, 1e-1, log=True)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     # 交叉熵损失函数
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     # 配置训练时用的优化器、损失函数和准确率评测标准
@@ -59,6 +61,7 @@ def train_and_val():
     # 配置回调函数
     callback = [
         # ReduceLROnPlateau(monitor='loss', factor=0.9, patience=10, verbose=1),
+        optuna.integration.TFKerasPruningCallback(trial, "val_accuracy"),
         tf.keras.callbacks.ModelCheckpoint('../model/posture_classify.h5', monitor='val_accuracy', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
     ]
 
@@ -129,7 +132,20 @@ def train_and_val():
 if __name__ == '__main__':
     # GPU_Config()
     # gennerate_terecord_trainfile(cfg.train_dataset_path, cfg.val_dataset_path)
-    train_and_val()
+    # storage_name = "sqlite:///optuna.db"
+    study = optuna.create_study(
+        pruner=optuna.pruners.MedianPruner(n_warmup_steps=10), direction="maximize",
+        study_name="sleepposture-tf", storage=None
+        # , load_if_exists=True
+    )
+    study.optimize(train_and_val, n_trials=20)
+
+    best_params = study.best_params
+    best_value = study.best_value
+    print("\n\nbest_value = " + str(best_value))
+    print("best_params:")
+    print(best_params)
+    # train_and_val()
     # model = cnn_model()
     # 打印神经网络结构，统计参数数目
     # model.summary()

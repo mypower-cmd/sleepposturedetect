@@ -2,7 +2,7 @@ from easydict import EasyDict as edict
 
 cfg = edict()
 
-cfg.epochs = 2000
+cfg.epochs = 1200
 # cfg.one_batch_size = 625
 # cfg.row = cfg.one_batch_size
 # 求能量做为fft的输入
@@ -12,7 +12,7 @@ cfg.column = 6
 # cfg.category = 4
 cfg.category = 3    #孕妇的睡姿只有三类
 
-cfg.batch_size = 16
+cfg.batch_size = 8
 cfg.train_learning_rate = 1e-4
 cfg.val_rate = 0.2
 
