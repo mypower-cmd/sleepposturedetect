@@ -34,7 +34,7 @@ def train_and_val(trial):
     # GPU_Config()
 
     # 创建模型
-    model = cnn_model()
+    model = cnn_model_optuna(trial)
 
     # Adam优化器
     lr = trial.suggest_float("learning_rate", 1e-5, 1e-1, log=True)
