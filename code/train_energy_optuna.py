@@ -124,6 +124,8 @@ def train_and_val(trial):
     # model_path = "./model/posture_classify.h5"
     # model.save(model_path)
 
+    return test_acc
+
 
 
 
@@ -139,7 +141,7 @@ if __name__ == '__main__':
         study_name="sleepposture-tf", storage=None
         # , load_if_exists=True
     )
-    study.optimize(train_and_val, n_trials=20)
+    study.optimize(train_and_val, n_trials=30)
 
     best_params = study.best_params
     best_value = study.best_value
