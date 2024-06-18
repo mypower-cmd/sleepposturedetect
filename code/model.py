@@ -12,7 +12,7 @@ def cnn_model_optuna(trial):
     x = layers.AveragePooling2D()(x)
     # x = layers.Flatten()(x)
     x = layers.Dense(32, activation='relu')(x)
-    dropout = trial.suggest_float("dropout_{}".format(i), 0.1, 0.5)
+    dropout = trial.suggest_float("dropout:", 0, 0.5, log=True)
     x = layers.Dropout(rate=dropout)(x)
     model_output = layers.Dense(cfg.category, activation='softmax')(x)
     model = keras.Model(input_data, model_output)
