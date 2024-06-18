@@ -37,7 +37,7 @@ def train_and_val(trial):
     model = cnn_model_optuna(trial)
 
     # Adam优化器
-    lr = trial.suggest_float("learning_rate", 1e-5, 1e-1, log=True)
+    lr = trial.suggest_float("learning_rate", 1e-6, 1e-1, log=True)
     optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     # 交叉熵损失函数
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         study_name="sleepposture-tf", storage=None
         # , load_if_exists=True
     )
-    study.optimize(train_and_val, n_trials=30)
+    study.optimize(train_and_val, n_trials=50)
 
     best_params = study.best_params
     best_value = study.best_value

@@ -2,7 +2,7 @@ from easydict import EasyDict as edict
 
 cfg = edict()
 
-cfg.epochs = 1200
+cfg.epochs = 2000
 # cfg.one_batch_size = 625
 # cfg.row = cfg.one_batch_size
 # 求能量做为fft的输入
