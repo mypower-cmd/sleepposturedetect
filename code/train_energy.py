@@ -119,8 +119,8 @@ def train_and_val():
     print('测试准确率：', test_acc)
     print('测试损失', test_loss)
     # 模型保存
-    # model_path = "./model/posture_classify.h5"
-    # model.save(model_path)
+    model_path = "./model/posture_classify_final.h5"
+    model.save(model_path)
 
 
 
@@ -130,8 +130,8 @@ def train_and_val():
 
 if __name__ == '__main__':
     # GPU_Config()
-    gennerate_terecord_trainfile(cfg.train_dataset_path, cfg.val_dataset_path)
-    # train_and_val()
+    # gennerate_terecord_trainfile(cfg.train_dataset_path, cfg.val_dataset_path)
+    train_and_val()
     # model = cnn_model()
     # 打印神经网络结构，统计参数数目
     # model.summary()

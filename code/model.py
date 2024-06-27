@@ -84,7 +84,7 @@ def cnn_model():
 
     x = layers.Flatten()(x)
     x = layers.Dense(64, activation='relu')(x)
-    x = layers.Dropout(0.1)(x)
+    x = layers.Dropout(0.5)(x)
     x = layers.Dense(32, activation='relu')(x)
     model_output = layers.Dense(cfg.category, activation='softmax')(x)
     model = keras.Model(input_data, model_output)
