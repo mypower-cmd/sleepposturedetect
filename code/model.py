@@ -35,20 +35,20 @@ def cnn_model_optuna(trial):
 
 # 基础的CNN模型
 def cnn_model():
-    input_data = keras.Input(shape=(cfg.row, cfg.column, 1))
-    x = layers.Conv2D(32, (3, 3), activation='relu')(input_data)
-    x = layers.AveragePooling2D()(x)
-    x = layers.Conv2D(64, (1, 1), activation="relu")(x)
-    x = layers.AveragePooling2D()(x)
-
-    x = layers.Flatten()(x)
-    x = layers.Dense(64, activation='relu')(x)
-    # dropout = trial.suggest_float("dropout:", 0.1, 0.5, log=True)
-    x = layers.Dropout(rate=0.15)(x)
-    x = layers.Dense(32, activation='relu')(x)
-    model_output = layers.Dense(cfg.category, activation='softmax')(x)
-    model = keras.Model(input_data, model_output)
-    return model
+    # input_data = keras.Input(shape=(cfg.row, cfg.column, 1))
+    # x = layers.Conv2D(32, (3, 3), activation='relu')(input_data)
+    # x = layers.AveragePooling2D()(x)
+    # x = layers.Conv2D(64, (1, 1), activation="relu")(x)
+    # x = layers.AveragePooling2D()(x)
+    #
+    # x = layers.Flatten()(x)
+    # x = layers.Dense(64, activation='relu')(x)
+    # # dropout = trial.suggest_float("dropout:", 0.1, 0.5, log=True)
+    # x = layers.Dropout(rate=0.15)(x)
+    # x = layers.Dense(32, activation='relu')(x)
+    # model_output = layers.Dense(cfg.category, activation='softmax')(x)
+    # model = keras.Model(input_data, model_output)
+    # return model
 
     # input_data = keras.Input(shape=(cfg.row, cfg.column, 1))
     # x = layers.Conv2D(32, (3, 3), activation='relu')(input_data)
@@ -76,19 +76,19 @@ def cnn_model():
     # return model
 
     # 准确率90%
-    # input_data = keras.Input(shape=(cfg.row, cfg.column, 1))
-    # x = layers.Conv2D(32, (3, 3), activation='relu')(input_data)
-    # x = layers.AveragePooling2D()(x)
-    # x = layers.Conv2D(64, (1, 1), activation="relu")(x)
-    # x = layers.AveragePooling2D()(x)
-    #
-    # x = layers.Flatten()(x)
-    # x = layers.Dense(64, activation='relu')(x)
-    # # x = layers.Dropout(0.5)(x)
-    # x = layers.Dense(32, activation='relu')(x)
-    # model_output = layers.Dense(cfg.category, activation='softmax')(x)
-    # model = keras.Model(input_data, model_output)
-    # return model
+    input_data = keras.Input(shape=(cfg.row, cfg.column, 1))
+    x = layers.Conv2D(32, (3, 3), activation='relu')(input_data)
+    x = layers.AveragePooling2D()(x)
+    x = layers.Conv2D(64, (1, 1), activation="relu")(x)
+    x = layers.AveragePooling2D()(x)
+
+    x = layers.Flatten()(x)
+    x = layers.Dense(64, activation='relu')(x)
+    x = layers.Dropout(0.1)(x)
+    x = layers.Dense(32, activation='relu')(x)
+    model_output = layers.Dense(cfg.category, activation='softmax')(x)
+    model = keras.Model(input_data, model_output)
+    return model
 
 # def cnn_model():
 #     input_data = keras.Input(shape=(cfg.row, cfg.column, 1))

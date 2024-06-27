@@ -114,7 +114,8 @@ def gennerate_terecord_trainfile(tfrecordtrainfilename,tfrecordvalfilename):
     train_num_samples = 0
     with tf.io.TFRecordWriter(tfrecordtrainfilename) as trainwriter:
         with tf.io.TFRecordWriter(tfrecordvalfilename) as valwriter:
-            filenames = os.listdir(r"../raw_data/")
+            # filenames = os.listdir(r"../raw_data/")
+            filenames = os.listdir(r"../all_data/")
             file_index = 0
             files_number = len(filenames)
             for filename in filenames:
@@ -128,12 +129,12 @@ def gennerate_terecord_trainfile(tfrecordtrainfilename,tfrecordvalfilename):
                 elif filename.endswith('left.xlsx'):
                     print('2')
                     label = 2
-                # elif filename.endswith('motion.xlsx'):
-                #     print('3')
-                #     label = 3
+                elif filename.endswith('prone.xlsx'):
+                    print('3')
+                    label = 3
                 else:
                     continue
-                raw_data = read_xlsx(f'../raw_data/{filename}')
+                raw_data = read_xlsx(f'../all_data/{filename}')
                 raw_data_len = len(raw_data)
                 batch = int(raw_data_len / batch_size)
                 modnum = int(batch / (batch * (val_rate)))
@@ -619,7 +620,7 @@ def gen_data_batch(file_pattern, batch_size, is_training=True):
         dataset = dataset.repeat()
         dataset = dataset.map(_parse_example, num_parallel_calls=tf.data.AUTOTUNE)
         dataset = dataset.batch(batch_size)
-        # dataset = dataset.shuffle(buffer_size=batch_size)
+        dataset = dataset.shuffle(buffer_size=batch_size)
         dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
     else:
         dataset = dataset.repeat()

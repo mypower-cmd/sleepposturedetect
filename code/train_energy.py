@@ -4,6 +4,8 @@ from model import *
 import matplotlib.pyplot as plt
 from data_process import *
 import datetime
+import matplotlib
+matplotlib.use('TkAgg')
 
 
 #配置GPU，限制GPU内存增长
@@ -128,8 +130,8 @@ def train_and_val():
 
 if __name__ == '__main__':
     # GPU_Config()
-    # gennerate_terecord_trainfile(cfg.train_dataset_path, cfg.val_dataset_path)
-    train_and_val()
+    gennerate_terecord_trainfile(cfg.train_dataset_path, cfg.val_dataset_path)
+    # train_and_val()
     # model = cnn_model()
     # 打印神经网络结构，统计参数数目
     # model.summary()
